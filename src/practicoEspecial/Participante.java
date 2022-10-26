@@ -3,8 +3,10 @@ package practicoEspecial;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-public class Participante implements Comparable<Participante>{
-	private String nombre;
+import practicoEspecial.filtros.Criterio;
+
+public class Participante extends Elemento implements Comparable<Participante>{
+
 	private String apellido;
 	private LocalDate fechaNacimiento;
 	private ArrayList<String> generosMusicales;
@@ -12,7 +14,7 @@ public class Participante implements Comparable<Participante>{
 	private ArrayList<String> instrumentos;
 	
 	public Participante(String nombre, String apellido, LocalDate fechaNacimiento) {
-		this.nombre = nombre;
+		super(nombre);
 		this.apellido = apellido;
 		this.fechaNacimiento = fechaNacimiento;
 		
@@ -21,19 +23,31 @@ public class Participante implements Comparable<Participante>{
 		this.instrumentos = new ArrayList<>();
 	}
 
-	public String getNombre() {
-		return nombre;
-	}
 
 	public String getApellido() {
 		return apellido;
 	}
-
-	public LocalDate getFechaNacimiento() {
-		return fechaNacimiento;
+	
+	@Override
+	public double getEdad() {
+		int edad;
+		edad = LocalDate.now().getYear() - this.fechaNacimiento.getYear();
+		if(!yaCumplio())
+			edad--;
+		return edad;
 	}
 
-	public ArrayList<String> getGenerosMusicales() {
+	private boolean yaCumplio() {
+		LocalDate hoy = LocalDate.now();
+		if(hoy.getMonthValue() > this.fechaNacimiento.getMonthValue())
+			return true;
+		else if(hoy.getMonthValue() == this.fechaNacimiento.getMonthValue() && 
+				hoy.getDayOfMonth() >= this.fechaNacimiento.getDayOfMonth())
+			return true;
+		return false;
+	}
+
+	public ArrayList<String> getGeneros() {
 		return new ArrayList<>(this.generosMusicales);
 	}
 
@@ -67,10 +81,43 @@ public class Participante implements Comparable<Participante>{
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		Participante pp1 = (Participante) obj;	
-		return ( this.getApellido().equals(pp1.getApellido()) ) &&
-				( this.getNombre().equals(pp1.getNombre()) );
+	public int getCantidad() {
+		// TODO Auto-generated method stub
+		return 1;
+	}
+
+	@Override
+	public ArrayList<Elemento> participantesCon(Criterio c1) {
+		ArrayList<Elemento> aux = new ArrayList<>();
+		if(c1.cumpleCon(this))
+			aux.add(this);
+		return aux;
+	}
+
+	@Override
+	public Elemento getCopy() {
+		Participante pp1 = new Participante(this.getNombre(), this.getApellido(), this.getFechaNacimiento());
+		
+		for (String genero : this.getGeneros()) {
+			pp1.addGeneroMusical(genero);
+		}
+		for (String instrumento : this.getInstrumentos()) {
+			pp1.addInstrumento(instrumento);
+		}
+		for (String idioma : this.getIdiomas()) {
+			pp1.addIdioma(idioma);
+		}
+		return pp1;
+	}
+
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return "Nombre: "+this.getNombre()+" "+this.getApellido()+ "Edad: "+this.getEdad()+"Idiomas:" +this.getIdiomas()+"Instrumentos: "+this.getInstrumentos()+"Generos: "+this.getGeneros();
+	}
+
+	public LocalDate getFechaNacimiento() {
+		return this.fechaNacimiento;
 	}
 	
 	
